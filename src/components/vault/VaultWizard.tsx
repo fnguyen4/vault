@@ -96,12 +96,12 @@ export function VaultWizard() {
         {[1, 2, 3].map((n) => (
           <div
             key={n}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
+            className={`h-2 rounded-full transition-all duration-300 ${
               n === state.step
-                ? "w-8 bg-amber-400"
+                ? "w-8 bg-orange-400"
                 : n < state.step
-                ? "w-4 bg-amber-400/40"
-                : "w-4 bg-slate-700"
+                ? "w-4 bg-orange-300"
+                : "w-4 bg-stone-200"
             }`}
           />
         ))}
@@ -124,7 +124,7 @@ export function VaultWizard() {
       )}
 
       {apiError && (
-        <p className="mt-4 text-sm text-red-400 bg-red-950/40 border border-red-800 rounded-xl px-4 py-3">
+        <p className="mt-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
           {apiError}
         </p>
       )}

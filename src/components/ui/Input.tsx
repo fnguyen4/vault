@@ -1,7 +1,7 @@
 import { InputHTMLAttributes, TextareaHTMLAttributes, forwardRef } from "react";
 
 const inputClass =
-  "w-full bg-slate-800 border border-slate-600 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors";
+  "w-full bg-white border border-stone-200 text-stone-800 placeholder-stone-400 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 shadow-warm transition-all";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -12,10 +12,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, className = "", ...props }, ref) => (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <label className="text-sm font-medium text-slate-300">{label}</label>
+        <label className="text-sm font-medium text-stone-600">{label}</label>
       )}
       <input ref={ref} className={`${inputClass} ${className}`} {...props} />
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   )
 );
@@ -30,14 +30,14 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, className = "", ...props }, ref) => (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <label className="text-sm font-medium text-slate-300">{label}</label>
+        <label className="text-sm font-medium text-stone-600">{label}</label>
       )}
       <textarea
         ref={ref}
         className={`${inputClass} resize-none ${className}`}
         {...props}
       />
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   )
 );

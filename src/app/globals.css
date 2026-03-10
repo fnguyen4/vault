@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -11,13 +11,12 @@
 }
 
 body {
-  background-color: #020617;
-  color: #f1f5f9;
+  background-color: #fff7ed;
+  color: #292524;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Native date input dark style */
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.7);
   cursor: pointer;
+  opacity: 0.5;
 }

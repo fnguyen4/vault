@@ -10,19 +10,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants = {
   primary:
-    "bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold disabled:bg-amber-400/40",
+    "bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-semibold shadow-warm hover:shadow-warm-md disabled:opacity-50",
   secondary:
-    "bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-600 disabled:opacity-40",
+    "bg-white hover:bg-orange-50 text-stone-700 border border-stone-200 shadow-warm hover:border-orange-200 disabled:opacity-50",
   ghost:
-    "bg-transparent hover:bg-slate-800 text-slate-300 hover:text-slate-100 disabled:opacity-40",
+    "bg-transparent hover:bg-orange-50 text-stone-500 hover:text-stone-700 disabled:opacity-50",
   danger:
-    "bg-red-600 hover:bg-red-500 text-white font-semibold disabled:opacity-40",
+    "bg-red-500 hover:bg-red-600 text-white font-semibold shadow-warm disabled:opacity-50",
 };
 
 const sizes = {
-  sm: "px-3 py-1.5 text-sm rounded-lg",
-  md: "px-5 py-2.5 text-sm rounded-xl",
-  lg: "px-6 py-3 text-base rounded-xl",
+  sm: "px-3.5 py-1.5 text-sm rounded-xl",
+  md: "px-5 py-2.5 text-sm rounded-2xl",
+  lg: "px-6 py-3.5 text-base rounded-2xl",
 };
 
 export function Button({
@@ -37,7 +37,7 @@ export function Button({
   return (
     <button
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center gap-2 transition-colors duration-150 ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 transition-all duration-150 ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {loading && <Spinner size="sm" />}

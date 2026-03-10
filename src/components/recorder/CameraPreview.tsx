@@ -17,7 +17,7 @@ export function CameraPreview({ stream, mirrored = true }: CameraPreviewProps) {
   }, [stream]);
 
   return (
-    <div className="relative w-full aspect-video bg-slate-900 rounded-2xl overflow-hidden border border-slate-700">
+    <div className="relative w-full aspect-video bg-stone-100 rounded-3xl overflow-hidden border border-stone-200 shadow-warm">
       {stream ? (
         <video
           ref={videoRef}
@@ -27,21 +27,10 @@ export function CameraPreview({ stream, mirrored = true }: CameraPreviewProps) {
           className={`w-full h-full object-cover ${mirrored ? "-scale-x-100" : ""}`}
         />
       ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500">
-          <svg
-            className="w-12 h-12 mb-3"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-            />
-          </svg>
-          <p className="text-sm">Camera preview</p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-stone-400">
+          <span className="text-5xl mb-3">🎥</span>
+          <p className="text-sm text-stone-500">Camera preview</p>
+          <p className="text-xs text-stone-400 mt-1">Enable camera to get started</p>
         </div>
       )}
     </div>

@@ -21,35 +21,29 @@ export function VaultCard({ vault }: VaultCardProps) {
   return (
     <Link
       href={`/vault/${vault.id}`}
-      className="group block bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-2xl p-5 transition-all duration-200"
+      className="group block bg-white hover:bg-orange-50/50 border border-stone-200 hover:border-orange-200 rounded-3xl p-5 shadow-warm hover:shadow-warm-md transition-all duration-200"
     >
       <div className="flex items-start justify-between mb-4">
-        <div
-          className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-            isUnlocked
-              ? "bg-emerald-950 text-emerald-400"
-              : "bg-amber-950 text-amber-400"
-          }`}
-        >
-          {isUnlocked ? <UnlockIcon /> : <LockIcon />}
+        <div className="text-3xl">
+          {isUnlocked ? "🔓" : "🔐"}
         </div>
         {!vault.hasRecording && (
-          <span className="text-xs text-amber-400 bg-amber-950/60 border border-amber-800/40 px-2 py-0.5 rounded-full">
-            No recording
+          <span className="text-xs text-orange-500 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-full font-medium">
+            Add recording
           </span>
         )}
       </div>
-      <h3 className="font-semibold text-slate-100 group-hover:text-white mb-1 leading-snug">
+      <h3 className="font-semibold text-stone-800 group-hover:text-stone-900 mb-1 leading-snug">
         {vault.title}
       </h3>
-      <p className="text-sm text-slate-400 mb-4">{subtitle}</p>
+      <p className="text-sm text-stone-400 mb-4">{subtitle}</p>
       {isUnlocked ? (
-        <p className="text-xs text-emerald-400">
-          Opened · {formatUnlockDate(vault.unlockDate)}
+        <p className="text-xs text-teal-600 font-medium">
+          ✅ Opened · {formatUnlockDate(vault.unlockDate)}
         </p>
       ) : (
-        <p className="text-xs text-slate-500">
-          Opens in {daysRemaining === 0 ? "less than a day" : `${daysRemaining} day${daysRemaining !== 1 ? "s" : ""}`}
+        <p className="text-xs text-stone-400">
+          🗓 Opens in {daysRemaining === 0 ? "less than a day" : `${daysRemaining} day${daysRemaining !== 1 ? "s" : ""}`}
           {" · "}
           {formatUnlockDate(vault.unlockDate)}
         </p>

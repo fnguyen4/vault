@@ -56,16 +56,16 @@ export function RegisterForm() {
         autoComplete="new-password"
       />
       {error && (
-        <p className="text-sm text-red-400 bg-red-950/40 border border-red-800 rounded-xl px-4 py-3">
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
           {error}
         </p>
       )}
-      <Button type="submit" size="lg" loading={loading} className="mt-1">
+      <Button type="submit" size="lg" loading={loading} className="mt-1 w-full">
         Create account
       </Button>
-      <p className="text-center text-sm text-slate-500">
+      <p className="text-center text-sm text-stone-400">
         Already have an account?{" "}
-        <Link href="/signin" className="text-amber-400 hover:text-amber-300">
+        <Link href="/signin" className="text-orange-500 hover:text-orange-600 font-medium">
           Sign in
         </Link>
       </p>

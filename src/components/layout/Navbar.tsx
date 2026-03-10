@@ -15,17 +15,17 @@ export function Navbar() {
   };
 
   return (
-    <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-10">
+    <header className="border-b border-orange-100 bg-orange-50/80 backdrop-blur-sm sticky top-0 z-10">
       <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <LockIcon className="w-5 h-5 text-amber-400" />
-          <span className="font-semibold text-slate-100 text-sm tracking-wide">
+          <span className="text-2xl">🔐</span>
+          <span className="font-bold text-stone-800 text-sm tracking-wide">
             Vault
           </span>
         </Link>
         <div className="flex items-center gap-3">
           {user && (
-            <span className="text-slate-500 text-sm hidden sm:block">
+            <span className="text-stone-400 text-sm hidden sm:block">
               {user.displayName}
             </span>
           )}

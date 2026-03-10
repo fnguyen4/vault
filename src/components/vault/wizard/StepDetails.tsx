@@ -33,18 +33,18 @@ export function StepDetails({ state, onSubmit, onBack, loading }: StepDetailsPro
       <button
         type="button"
         onClick={onBack}
-        className="flex items-center gap-1 text-slate-400 hover:text-slate-200 text-sm mb-6 transition-colors"
+        className="flex items-center gap-1 text-stone-400 hover:text-stone-600 text-sm mb-6 transition-colors"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
         Back
       </button>
-      <h2 className="text-2xl font-semibold text-slate-100 mb-2">
-        A few more details
+      <h2 className="text-2xl font-bold text-stone-800 mb-2">
+        Almost there! 🌟
       </h2>
-      <p className="text-slate-400 mb-8">
-        This helps Claude craft personal prompts just for you.
+      <p className="text-stone-500 mb-8">
+        A few details so Claude can craft the perfect recording prompts.
       </p>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {showRecipient && (
@@ -83,8 +83,8 @@ export function StepDetails({ state, onSubmit, onBack, loading }: StepDetailsPro
           rows={3}
         />
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-slate-300">
-            Unlock date
+          <label className="text-sm font-medium text-stone-600">
+            🗓 Unlock date
           </label>
           <input
             type="date"
@@ -92,14 +92,14 @@ export function StepDetails({ state, onSubmit, onBack, loading }: StepDetailsPro
             value={unlockDate}
             onChange={(e) => setUnlockDate(e.target.value)}
             required
-            className="w-full bg-slate-800 border border-slate-600 text-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors"
+            className="w-full bg-white border border-stone-200 text-stone-800 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 shadow-warm transition-all"
           />
-          <p className="text-xs text-slate-500">
-            The vault will stay locked until this date.
+          <p className="text-xs text-stone-400">
+            The vault will stay locked until this special day 🔒
           </p>
         </div>
-        <Button type="submit" size="lg" loading={loading} className="mt-2">
-          {loading ? "Creating vault…" : "Continue to recording"}
+        <Button type="submit" size="lg" loading={loading} className="mt-2 w-full">
+          {loading ? "Creating your vault…✨" : "Continue to recording 🎥"}
         </Button>
       </form>
     </div>

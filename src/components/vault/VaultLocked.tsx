@@ -30,54 +30,44 @@ export function VaultLocked({ vault: v }: VaultLockedProps) {
 
   return (
     <div className="flex flex-col items-center text-center py-12 animate-fade-in">
-      {/* Lock icon */}
-      <div className="w-20 h-20 rounded-3xl bg-amber-950 border border-amber-800/40 flex items-center justify-center mb-6">
-        <svg
-          className="w-10 h-10 text-amber-400"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          viewBox="0 0 24 24"
-        >
-          <rect x="3" y="11" width="18" height="11" rx="2" />
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-        </svg>
-      </div>
+      {/* Lock emoji */}
+      <div className="text-7xl mb-5">🔐</div>
 
-      <p className="text-sm text-amber-400 font-medium mb-2">Locked</p>
-      <h1 className="text-2xl font-semibold text-slate-100 mb-1">{v.title}</h1>
-      {subtitle && <p className="text-slate-400 text-sm mb-6">{subtitle}</p>}
+      <span className="inline-flex items-center gap-1.5 bg-orange-100 text-orange-600 text-xs font-semibold px-3 py-1 rounded-full mb-4">
+        Locked
+      </span>
+      <h1 className="text-2xl font-bold text-stone-800 mb-1">{v.title}</h1>
+      {subtitle && <p className="text-stone-500 text-sm mb-6">{subtitle}</p>}
       {!subtitle && <div className="mb-6" />}
 
       {/* Countdown */}
-      <p className="text-sm text-slate-500 mb-4">This vault opens in</p>
-      <div className="flex gap-4 mb-2">
+      <p className="text-sm text-stone-400 mb-5">This vault opens in ✨</p>
+      <div className="flex gap-3 mb-2">
         {units.map(({ value, label }) => (
-          <div key={label} className="flex flex-col items-center">
-            <span className="text-3xl font-bold text-slate-100 tabular-nums w-12 text-center">
+          <div key={label} className="flex flex-col items-center bg-white border border-stone-200 rounded-2xl px-4 py-3 shadow-warm min-w-[60px]">
+            <span className="text-2xl font-bold text-stone-800 tabular-nums">
               {String(value).padStart(2, "0")}
             </span>
-            <span className="text-xs text-slate-500 mt-1">{label}</span>
+            <span className="text-xs text-stone-400 mt-1">{label}</span>
           </div>
         ))}
       </div>
-      <p className="text-xs text-slate-600 mt-2">
-        Opens {formatUnlockDate(v.unlockDate)}
+      <p className="text-xs text-stone-400 mt-3">
+        Opens on {formatUnlockDate(v.unlockDate)} 🗓
       </p>
 
       {/* Record CTA if no recording yet */}
       {!v.hasRecording && (
-        <div className="mt-10 p-5 bg-slate-800 border border-slate-700 rounded-2xl max-w-sm text-left">
-          <p className="text-sm font-medium text-slate-200 mb-1">
-            No recording yet
+        <div className="mt-10 p-6 bg-white border border-orange-200 rounded-3xl shadow-warm max-w-sm text-left">
+          <p className="text-base font-semibold text-stone-800 mb-1.5">
+            💬 Add your message
           </p>
-          <p className="text-sm text-slate-400 mb-4">
-            Record your video message while the vault is locked — it will be
-            revealed on the unlock date.
+          <p className="text-sm text-stone-500 mb-4 leading-relaxed">
+            Record your heartfelt video now — it will be waiting when the vault opens.
           </p>
           <Link href={`/vault/${v.id}/record`}>
             <Button variant="primary" size="md">
-              Record now
+              Record now 🎥
             </Button>
           </Link>
         </div>
