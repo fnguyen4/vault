@@ -38,7 +38,7 @@ export interface Vault {
 // --- Wizard ---
 
 export interface WizardState {
-  step: 1 | 2 | 3;
+  step: number;
   vaultFor: VaultFor | null;
   purpose: VaultPurpose | null;
   recipientName: string;
@@ -67,7 +67,7 @@ export interface VaultRequest {
 }
 
 export interface RequestWizardState {
-  step: 1 | 2 | 3;
+  step: number;
   purpose: VaultPurpose | null;
   occasionName: string;
   title: string;

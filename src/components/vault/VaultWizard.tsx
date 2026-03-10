@@ -5,13 +5,42 @@ import { useRouter } from "next/navigation";
 import type { WizardState, VaultFor, VaultPurpose, Vault } from "@/types";
 import { StepWhoFor } from "./wizard/StepWhoFor";
 import { StepWhatFor } from "./wizard/StepWhatFor";
-import { StepDetails } from "./wizard/StepDetails";
+import { StepRecipientName } from "./wizard/StepRecipientName";
+import { StepOccasion } from "./wizard/StepOccasion";
+import { StepTitle } from "./wizard/StepTitle";
+import { StepUnlockDate } from "./wizard/StepUnlockDate";
+import { StepRecipientEmail } from "./wizard/StepRecipientEmail";
+import { StepDescription } from "./wizard/StepDescription";
 import { saveVault } from "@/lib/storage/vaults";
 import { generateVaultId } from "@/lib/utils/ids";
 import { useAuth } from "@/context/AuthContext";
 
+// ─── Step sequence ────────────────────────────────────────────────────────────
+
+type StepId =
+  | "who_for"
+  | "what_for"
+  | "recipient_name"
+  | "occasion"
+  | "title"
+  | "unlock_date"
+  | "recipient_email"
+  | "description";
+
+function getStepSequence(state: WizardState): StepId[] {
+  const steps: StepId[] = ["who_for", "what_for"];
+  if (state.vaultFor === "for_someone_else") steps.push("recipient_name");
+  if (state.purpose === "specific_occasion") steps.push("occasion");
+  steps.push("title", "unlock_date");
+  if (state.vaultFor === "for_someone_else") steps.push("recipient_email");
+  steps.push("description");
+  return steps;
+}
+
+// ─── Initial state ────────────────────────────────────────────────────────────
+
 const initialState: WizardState = {
-  step: 1,
+  step: 0,
   vaultFor: null,
   purpose: null,
   recipientName: "",
@@ -22,6 +51,8 @@ const initialState: WizardState = {
   description: "",
 };
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function VaultWizard() {
   const { user } = useAuth();
   const router = useRouter();
@@ -29,32 +60,46 @@ export function VaultWizard() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
-  const update = (partial: Partial<WizardState>) =>
-    setState((s) => ({ ...s, ...partial }));
+  const steps = getStepSequence(state);
+  const currentStep = steps[state.step] as StepId | undefined;
+  const totalSteps = steps.length;
+  const progress = ((state.step + 1) / totalSteps) * 100;
 
-  const handleWhoFor = (vaultFor: VaultFor) => {
-    update({ vaultFor, step: 2 });
-  };
+  /** Advance to next step, optionally saving field updates */
+  const next = (updates: Partial<WizardState> = {}) =>
+    setState((s) => ({ ...s, ...updates, step: s.step + 1 }));
 
-  const handleWhatFor = (purpose: VaultPurpose) => {
-    update({ purpose, step: 3 });
-  };
+  /** Go back one step */
+  const back = () =>
+    setState((s) => ({ ...s, step: Math.max(0, s.step - 1) }));
 
-  const handleDetails = async (partial: Partial<WizardState>) => {
+  // Suggested vault title built from previous answers
+  const suggestedTitle = (() => {
+    if (state.vaultFor === "for_someone_else" && state.recipientName) {
+      if (state.purpose === "specific_occasion" && state.occasionName)
+        return `To ${state.recipientName} on their ${state.occasionName}`;
+      return `A message for ${state.recipientName}`;
+    }
+    if (state.purpose === "specific_occasion" && state.occasionName)
+      return `A message for my ${state.occasionName}`;
+    return "A message to my future self";
+  })();
+
+  // Final step: call /api/prompts, save vault, redirect
+  const handleFinish = async (description: string) => {
     if (!user || !state.vaultFor || !state.purpose) return;
-    update(partial);
     setLoading(true);
     setApiError(null);
 
-    const merged = { ...state, ...partial };
+    const merged = { ...state, description };
 
     try {
       const res = await fetch("/api/prompts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          vaultFor: state.vaultFor,
-          purpose: state.purpose,
+          vaultFor: merged.vaultFor,
+          purpose: merged.purpose,
           recipientName: merged.recipientName,
           occasionName: merged.occasionName,
           title: merged.title,
@@ -70,10 +115,10 @@ export function VaultWizard() {
         ownerId: user.id,
         title: merged.title,
         description: merged.description,
-        vaultFor: state.vaultFor,
-        purpose: state.purpose,
+        vaultFor: state.vaultFor!,
+        purpose: state.purpose!,
         recipientName: merged.recipientName,
-        recipientEmail: merged.recipientEmail ?? "",
+        recipientEmail: merged.recipientEmail,
         occasionName: merged.occasionName,
         unlockDate: merged.unlockDate,
         createdAt: new Date().toISOString(),
@@ -93,40 +138,88 @@ export function VaultWizard() {
 
   return (
     <div className="max-w-lg mx-auto">
-      {/* Progress dots */}
-      <div className="flex items-center gap-2 mb-10">
-        {[1, 2, 3].map((n) => (
+      {/* Progress bar */}
+      <div className="mb-12">
+        <div className="h-1 bg-stone-100 rounded-full overflow-hidden">
           <div
-            key={n}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              n === state.step
-                ? "w-8 bg-rose-500"
-                : n < state.step
-                ? "w-4 bg-rose-300"
-                : "w-4 bg-stone-200"
-            }`}
+            className="h-full bg-rose-400 rounded-full transition-all duration-500"
+            style={{ width: `${progress}%` }}
           />
-        ))}
+        </div>
       </div>
 
-      {state.step === 1 && <StepWhoFor onSelect={handleWhoFor} />}
-      {state.step === 2 && (
-        <StepWhatFor
-          onSelect={handleWhatFor}
-          onBack={() => update({ step: 1 })}
+      {/* Steps */}
+      {currentStep === "who_for" && (
+        <StepWhoFor
+          onSelect={(vaultFor: VaultFor) =>
+            setState((s) => ({ ...s, vaultFor, step: s.step + 1 }))
+          }
         />
       )}
-      {state.step === 3 && (
-        <StepDetails
-          state={state}
-          onSubmit={handleDetails}
-          onBack={() => update({ step: 2 })}
+
+      {currentStep === "what_for" && (
+        <StepWhatFor
+          onSelect={(purpose: VaultPurpose) =>
+            setState((s) => ({ ...s, purpose, step: s.step + 1 }))
+          }
+          onBack={back}
+        />
+      )}
+
+      {currentStep === "recipient_name" && (
+        <StepRecipientName
+          initialValue={state.recipientName}
+          onNext={(recipientName) => next({ recipientName })}
+          onBack={back}
+        />
+      )}
+
+      {currentStep === "occasion" && (
+        <StepOccasion
+          initialValue={state.occasionName}
+          onNext={(occasionName) => next({ occasionName })}
+          onBack={back}
+        />
+      )}
+
+      {currentStep === "title" && (
+        <StepTitle
+          initialValue={state.title}
+          suggestedTitle={suggestedTitle}
+          onNext={(title) => next({ title })}
+          onBack={back}
+        />
+      )}
+
+      {currentStep === "unlock_date" && (
+        <StepUnlockDate
+          initialValue={state.unlockDate}
+          onNext={(unlockDate) => next({ unlockDate })}
+          onBack={back}
+        />
+      )}
+
+      {currentStep === "recipient_email" && (
+        <StepRecipientEmail
+          recipientName={state.recipientName}
+          initialValue={state.recipientEmail}
+          onNext={(recipientEmail) => next({ recipientEmail })}
+          onBack={back}
+          onSkip={() => next({ recipientEmail: "" })}
+        />
+      )}
+
+      {currentStep === "description" && (
+        <StepDescription
+          initialValue={state.description}
+          onNext={handleFinish}
+          onBack={back}
           loading={loading}
         />
       )}
 
       {apiError && (
-        <p className="mt-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
+        <p className="mt-6 text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
           {apiError}
         </p>
       )}
