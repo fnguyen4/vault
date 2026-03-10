@@ -5,12 +5,14 @@ import type { Vault } from "@/types";
 import { useCountdown } from "@/hooks/useCountdown";
 import { formatUnlockDate } from "@/lib/utils/dates";
 import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/context/AuthContext";
 
 interface VaultLockedProps {
   vault: Vault;
 }
 
 export function VaultLocked({ vault: v }: VaultLockedProps) {
+  const { user } = useAuth();
   const { daysRemaining, hoursRemaining, minutesRemaining, secondsRemaining } =
     useCountdown(v.unlockDate);
 
@@ -72,7 +74,52 @@ export function VaultLocked({ vault: v }: VaultLockedProps) {
           </Link>
         </div>
       )}
+
+      {/* Notify recipient CTA */}
+      {v.hasRecording && v.vaultFor === "for_someone_else" && v.recipientEmail && (
+        <div className="mt-10 p-6 bg-white border border-stone-200 rounded-2xl shadow-warm max-w-sm text-left">
+          <p className="text-base font-semibold text-stone-900 mb-1.5">
+            Let {v.recipientName || "them"} know
+          </p>
+          <p className="text-sm text-stone-500 mb-4 leading-relaxed">
+            Your message is recorded and waiting. Send {v.recipientName || "them"} a note so they know something special is coming.
+          </p>
+          <a
+            href={buildNotifyMailto(v, user?.displayName ?? "")}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="primary" size="md">
+              <EnvelopeIcon className="w-4 h-4" />
+              Send notification
+            </Button>
+          </a>
+        </div>
+      )}
     </div>
+  );
+}
+
+function buildNotifyMailto(v: Vault, senderName: string): string {
+  const name = v.recipientName || "there";
+  const unlockFormatted = new Date(v.unlockDate).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  const subject = encodeURIComponent(`I recorded something special for you`);
+  const body = encodeURIComponent(
+    `Hi ${name},\n\nI've recorded a video message just for you — it will be ready to open on ${unlockFormatted}.\n\nI can't wait for you to see it. I hope it means as much to you as it did to me to make.\n\nWith love,\n${senderName || "Me"}`
+  );
+  return `mailto:${v.recipientEmail}?subject=${subject}&body=${body}`;
+}
+
+function EnvelopeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
   );
 }
 

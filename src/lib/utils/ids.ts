@@ -14,3 +14,7 @@ export function generateUserId(): string {
 export function generateVaultId(): string {
   return randomId("vlt");
 }
+
+export function generateRequestId(): string {
+  return randomId("req");
+}

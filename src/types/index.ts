@@ -27,6 +27,7 @@ export interface Vault {
   vaultFor: VaultFor;
   purpose: VaultPurpose;
   recipientName: string; // "" if vaultFor === "for_me"
+  recipientEmail: string; // "" if vaultFor === "for_me"
   occasionName: string; // "" if purpose === "general_memory"
   unlockDate: string; // ISO 8601 date string e.g. "2027-06-15"
   createdAt: string; // ISO 8601
@@ -41,10 +42,39 @@ export interface WizardState {
   vaultFor: VaultFor | null;
   purpose: VaultPurpose | null;
   recipientName: string;
+  recipientEmail: string;
   occasionName: string;
   unlockDate: string;
   title: string;
   description: string;
+}
+
+// --- Vault Request ---
+
+export interface VaultRequest {
+  id: string;           // "req_abc123"
+  requesterId: string;  // user ID of person requesting
+  requesterName: string;
+  purpose: VaultPurpose;
+  occasionName: string; // "" if purpose === "general_memory"
+  title: string;
+  description: string;
+  unlockDate: string;   // ISO 8601 date string
+  recipientName: string;
+  recipientEmail: string;
+  createdAt: string;    // ISO 8601
+  status: "pending" | "fulfilled";
+}
+
+export interface RequestWizardState {
+  step: 1 | 2 | 3;
+  purpose: VaultPurpose | null;
+  occasionName: string;
+  title: string;
+  description: string;
+  unlockDate: string;
+  recipientName: string;
+  recipientEmail: string;
 }
 
 // --- Video ---

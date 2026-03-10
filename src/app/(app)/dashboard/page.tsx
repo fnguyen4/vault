@@ -4,20 +4,42 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getVaultsByOwner } from "@/lib/storage/vaults";
-import type { Vault } from "@/types";
+import { getRequestsByOwner, updateRequestStatus, deleteRequest } from "@/lib/storage/requests";
+import type { Vault, VaultRequest } from "@/types";
 import { VaultCard } from "@/components/vault/VaultCard";
 import { Button } from "@/components/ui/Button";
+import { formatUnlockDate } from "@/lib/utils/dates";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const [vaults, setVaults] = useState<Vault[]>([]);
+  const [requests, setRequests] = useState<VaultRequest[]>([]);
 
   useEffect(() => {
-    if (user) setVaults(getVaultsByOwner(user.id));
+    if (user) {
+      setVaults(getVaultsByOwner(user.id));
+      setRequests(getRequestsByOwner(user.id));
+    }
   }, [user]);
+
+  const handleMarkFulfilled = (id: string) => {
+    updateRequestStatus(id, "fulfilled");
+    setRequests((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, status: "fulfilled" } : r))
+    );
+  };
+
+  const handleDeleteRequest = (id: string) => {
+    deleteRequest(id);
+    setRequests((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const pendingRequests = requests.filter((r) => r.status === "pending");
+  const fulfilledRequests = requests.filter((r) => r.status === "fulfilled");
 
   return (
     <div>
+      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-heading text-2xl text-stone-900">
@@ -29,35 +51,186 @@ export default function DashboardPage() {
               : `${vaults.length} vault${vaults.length !== 1 ? "s" : ""} saved`}
           </p>
         </div>
-        <Link href="/vault/new">
-          <Button variant="primary" size="md">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            New vault
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/vault/request">
+            <Button variant="secondary" size="md">
+              Request vault
+            </Button>
+          </Link>
+          <Link href="/vault/new">
+            <Button variant="primary" size="md">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              New vault
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      {vaults.length === 0 ? (
+      {/* Vaults */}
+      {vaults.length === 0 && requests.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {vaults
-            .slice()
-            .sort(
-              (a, b) =>
-                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            )
-            .map((vault) => (
-              <VaultCard key={vault.id} vault={vault} />
-            ))}
+        <>
+          {vaults.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+              {vaults
+                .slice()
+                .sort(
+                  (a, b) =>
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                )
+                .map((vault) => (
+                  <VaultCard key={vault.id} vault={vault} />
+                ))}
+            </div>
+          )}
+
+          {/* Pending Requests */}
+          {pendingRequests.length > 0 && (
+            <section className="mb-10">
+              <h2 className="font-heading text-lg text-stone-900 mb-4">
+                Pending requests
+              </h2>
+              <div className="flex flex-col gap-3">
+                {pendingRequests.map((req) => (
+                  <RequestCard
+                    key={req.id}
+                    request={req}
+                    onMarkFulfilled={handleMarkFulfilled}
+                    onDelete={handleDeleteRequest}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Fulfilled Requests */}
+          {fulfilledRequests.length > 0 && (
+            <section>
+              <h2 className="font-heading text-lg text-stone-900 mb-4">
+                Received
+              </h2>
+              <div className="flex flex-col gap-3">
+                {fulfilledRequests.map((req) => (
+                  <RequestCard
+                    key={req.id}
+                    request={req}
+                    onMarkFulfilled={handleMarkFulfilled}
+                    onDelete={handleDeleteRequest}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function RequestCard({
+  request: r,
+  onMarkFulfilled,
+  onDelete,
+}: {
+  request: VaultRequest;
+  onMarkFulfilled: (id: string) => void;
+  onDelete: (id: string) => void;
+}) {
+  const isFulfilled = r.status === "fulfilled";
+  const unlockFormatted = new Date(r.unlockDate).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const subject = encodeURIComponent(`Could you record a message for me?`);
+  const noteSection = r.description ? `\n\nHere's a little more about what I'd love to hear:\n${r.description}` : "";
+  const contextLine =
+    r.purpose === "specific_occasion" && r.occasionName
+      ? `It's for ${r.occasionName} — I'd love to open it on ${unlockFormatted}.`
+      : `I'd love to open it on ${unlockFormatted}.`;
+  const body = encodeURIComponent(
+    `Hi ${r.recipientName},\n\nI hope this message finds you well. I have a small, heartfelt request — would you be willing to record a short video message for me? ${contextLine}${noteSection}\n\nIt doesn't have to be long. Just something from you that I can hold onto.\n\nWith love,\n${r.requesterName}`
+  );
+  const mailtoHref = `mailto:${r.recipientEmail}?subject=${subject}&body=${body}`;
+
+  return (
+    <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-warm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3 min-w-0">
+          {/* Icon */}
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${isFulfilled ? "bg-emerald-50" : "bg-amber-50"}`}>
+            {isFulfilled ? (
+              <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+              </svg>
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-stone-900 truncate">{r.title}</p>
+            <p className="text-xs text-stone-500 mt-0.5">
+              Asked {r.recipientName} · unlocks {formatUnlockDate(r.unlockDate)}
+            </p>
+          </div>
+        </div>
+        {/* Status badge */}
+        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full flex-shrink-0 border ${isFulfilled ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-amber-50 text-amber-700 border-amber-100"}`}>
+          {isFulfilled ? "Received" : "Pending"}
+        </span>
+      </div>
+
+      {/* Actions */}
+      {!isFulfilled && (
+        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-stone-100">
+          <a href={mailtoHref} target="_blank" rel="noopener noreferrer" className="flex-1">
+            <Button variant="secondary" size="sm" className="w-full">
+              Resend email
+            </Button>
+          </a>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onMarkFulfilled(r.id)}
+          >
+            Mark received
+          </Button>
+          <button
+            onClick={() => onDelete(r.id)}
+            className="text-stone-300 hover:text-stone-500 transition-colors p-1"
+            aria-label="Delete request"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {isFulfilled && (
+        <div className="flex justify-end mt-4 pt-4 border-t border-stone-100">
+          <button
+            onClick={() => onDelete(r.id)}
+            className="text-stone-300 hover:text-stone-500 transition-colors p-1"
+            aria-label="Delete request"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       )}
     </div>
@@ -78,9 +251,14 @@ function EmptyState() {
         Create a video message for someone you love — or for your future self.
         It will stay sealed until the perfect moment.
       </p>
-      <Link href="/vault/new">
-        <Button variant="primary" size="lg">Create your first vault</Button>
-      </Link>
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+        <Link href="/vault/new">
+          <Button variant="primary" size="lg">Create your first vault</Button>
+        </Link>
+        <Link href="/vault/request">
+          <Button variant="secondary" size="lg">Request a vault</Button>
+        </Link>
+      </div>
     </div>
   );
 }
