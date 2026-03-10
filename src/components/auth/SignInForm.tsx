@@ -54,7 +54,7 @@ export function SignInForm() {
       </Button>
       <p className="text-center text-sm text-stone-400">
         No account?{" "}
-        <Link href="/register" className="text-orange-500 hover:text-orange-600 font-medium">
+        <Link href="/register" className="text-rose-600 hover:text-rose-700 font-medium">
           Create one
         </Link>
       </p>

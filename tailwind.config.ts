@@ -10,20 +10,23 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50:  "#fff7ed",
-          100: "#ffedd5",
-          200: "#fed7aa",
-          300: "#fdba74",
-          400: "#fb923c",
-          500: "#f97316",
-          600: "#ea580c",
-          700: "#c2410c",
+          50:  "#fff1f2",
+          100: "#ffe4e7",
+          200: "#fecdd3",
+          300: "#fda4af",
+          400: "#fb7185",
+          500: "#f43f5e",
+          600: "#e11d48",
+          700: "#be123c",
         },
       },
+      fontFamily: {
+        heading: ["var(--font-heading)", "Georgia", "serif"],
+      },
       boxShadow: {
-        warm:      "0 2px 8px 0 rgba(180,100,60,0.08), 0 1px 2px 0 rgba(180,100,60,0.06)",
-        "warm-md": "0 6px 20px -2px rgba(180,100,60,0.10), 0 2px 6px -2px rgba(180,100,60,0.06)",
-        "warm-lg": "0 12px 32px -4px rgba(180,100,60,0.12), 0 4px 10px -4px rgba(180,100,60,0.08)",
+        warm:      "0 1px 3px 0 rgba(0,0,0,0.07), 0 1px 2px -1px rgba(0,0,0,0.04)",
+        "warm-md": "0 4px 12px -2px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04)",
+        "warm-lg": "0 8px 24px -4px rgba(0,0,0,0.10), 0 4px 8px -4px rgba(0,0,0,0.06)",
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-out",

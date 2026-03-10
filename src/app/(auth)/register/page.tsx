@@ -6,13 +6,12 @@ export default function RegisterPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="text-5xl mb-5">💌</div>
-          <h1 className="text-2xl font-bold text-stone-800">
-            Create your Vault
+        <div className="mb-8">
+          <h1 className="font-heading text-3xl text-stone-900 mb-1.5">
+            Start your story.
           </h1>
-          <p className="text-stone-500 text-sm mt-1.5">
-            Record love letters to the future ✨
+          <p className="text-stone-500 text-sm">
+            Save video messages for the moments that matter.
           </p>
         </div>
         <RegisterForm />

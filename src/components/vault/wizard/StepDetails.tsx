@@ -41,11 +41,8 @@ export function StepDetails({ state, onSubmit, onBack, loading }: StepDetailsPro
         Back
       </button>
       <h2 className="text-2xl font-bold text-stone-800 mb-2">
-        Almost there! 🌟
+        A few details.
       </h2>
-      <p className="text-stone-500 mb-8">
-        A few details so Claude can craft the perfect recording prompts.
-      </p>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {showRecipient && (
           <Input
@@ -84,7 +81,7 @@ export function StepDetails({ state, onSubmit, onBack, loading }: StepDetailsPro
         />
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-stone-600">
-            🗓 Unlock date
+            Unlock date
           </label>
           <input
             type="date"
@@ -92,14 +89,14 @@ export function StepDetails({ state, onSubmit, onBack, loading }: StepDetailsPro
             value={unlockDate}
             onChange={(e) => setUnlockDate(e.target.value)}
             required
-            className="w-full bg-white border border-stone-200 text-stone-800 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 shadow-warm transition-all"
+            className="w-full bg-white border border-stone-200 text-stone-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-50 transition-all"
           />
           <p className="text-xs text-stone-400">
-            The vault will stay locked until this special day 🔒
+            The vault will stay sealed until this date.
           </p>
         </div>
         <Button type="submit" size="lg" loading={loading} className="mt-2 w-full">
-          {loading ? "Creating your vault…✨" : "Continue to recording 🎥"}
+          {loading ? "Creating your vault…" : "Continue to recording"}
         </Button>
       </form>
     </div>

@@ -10,19 +10,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants = {
   primary:
-    "bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-semibold shadow-warm hover:shadow-warm-md disabled:opacity-50",
+    "bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-semibold disabled:opacity-50",
   secondary:
-    "bg-white hover:bg-orange-50 text-stone-700 border border-stone-200 shadow-warm hover:border-orange-200 disabled:opacity-50",
+    "bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 hover:border-stone-300 disabled:opacity-50",
   ghost:
-    "bg-transparent hover:bg-orange-50 text-stone-500 hover:text-stone-700 disabled:opacity-50",
+    "bg-transparent hover:bg-stone-100 text-stone-500 hover:text-stone-700 disabled:opacity-50",
   danger:
-    "bg-red-500 hover:bg-red-600 text-white font-semibold shadow-warm disabled:opacity-50",
+    "bg-red-500 hover:bg-red-600 text-white font-semibold disabled:opacity-50",
 };
 
 const sizes = {
-  sm: "px-3.5 py-1.5 text-sm rounded-xl",
-  md: "px-5 py-2.5 text-sm rounded-2xl",
-  lg: "px-6 py-3.5 text-base rounded-2xl",
+  sm: "px-4 py-1.5 text-sm rounded-full",
+  md: "px-5 py-2.5 text-sm rounded-full",
+  lg: "px-7 py-3.5 text-base rounded-full",
 };
 
 export function Button({

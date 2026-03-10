@@ -1,7 +1,7 @@
 import { InputHTMLAttributes, TextareaHTMLAttributes, forwardRef } from "react";
 
 const inputClass =
-  "w-full bg-white border border-stone-200 text-stone-800 placeholder-stone-400 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 shadow-warm transition-all";
+  "w-full bg-white border border-stone-200 text-stone-800 placeholder-stone-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-50 transition-all";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;

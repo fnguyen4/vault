@@ -6,10 +6,11 @@ export default function SignInPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="text-5xl mb-5">🔐</div>
-          <h1 className="text-2xl font-bold text-stone-800">Welcome back 👋</h1>
-          <p className="text-stone-500 text-sm mt-1.5">Your memories are waiting for you</p>
+        <div className="mb-8">
+          <h1 className="font-heading text-3xl text-stone-900 mb-1.5">
+            Welcome back.
+          </h1>
+          <p className="text-stone-500 text-sm">Sign in to your account</p>
         </div>
         <SignInForm />
       </div>

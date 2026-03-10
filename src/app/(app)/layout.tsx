@@ -18,8 +18,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-orange-50">
-        <Spinner size="lg" className="text-orange-400" />
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Spinner size="lg" className="text-rose-500" />
       </div>
     );
   }

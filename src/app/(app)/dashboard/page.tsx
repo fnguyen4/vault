@@ -20,12 +20,12 @@ export default function DashboardPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-stone-800">
-            {user?.displayName ? `Hey, ${user.displayName.split(" ")[0]} 👋` : "Your vaults"}
+          <h1 className="font-heading text-2xl text-stone-900">
+            {user?.displayName ? `Hello, ${user.displayName.split(" ")[0]}.` : "Your vaults"}
           </h1>
           <p className="text-stone-500 text-sm mt-0.5">
             {vaults.length === 0
-              ? "Ready to capture something special?"
+              ? "Ready to create something special?"
               : `${vaults.length} vault${vaults.length !== 1 ? "s" : ""} saved`}
           </p>
         </div>
@@ -40,7 +40,7 @@ export default function DashboardPage() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            Create vault
+            New vault
           </Button>
         </Link>
       </div>
@@ -67,17 +67,19 @@ export default function DashboardPage() {
 function EmptyState() {
   return (
     <div className="text-center py-20">
-      <div className="text-6xl mb-5">💌</div>
-      <h2 className="text-xl font-bold text-stone-800 mb-2">
-        No vaults yet
-      </h2>
+      <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center mx-auto mb-6">
+        <svg className="w-7 h-7 text-rose-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+      </div>
+      <h2 className="font-heading text-xl text-stone-900 mb-2">No vaults yet</h2>
       <p className="text-stone-500 text-sm mb-8 max-w-xs mx-auto leading-relaxed">
-        Create a video time capsule for someone you love — or for your future self. They won't be able to open it until the perfect moment. 🌱
+        Create a video message for someone you love — or for your future self.
+        It will stay sealed until the perfect moment.
       </p>
       <Link href="/vault/new">
-        <Button variant="primary" size="lg">
-          Create your first vault ✨
-        </Button>
+        <Button variant="primary" size="lg">Create your first vault</Button>
       </Link>
     </div>
   );

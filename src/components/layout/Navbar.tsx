@@ -15,11 +15,13 @@ export function Navbar() {
   };
 
   return (
-    <header className="border-b border-orange-100 bg-orange-50/80 backdrop-blur-sm sticky top-0 z-10">
+    <header className="border-b border-stone-100 bg-white sticky top-0 z-10">
       <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="text-2xl">🔐</span>
-          <span className="font-bold text-stone-800 text-sm tracking-wide">
+        <Link href="/dashboard" className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-rose-600 flex items-center justify-center flex-shrink-0">
+            <LockIcon className="w-3.5 h-3.5 text-white" />
+          </div>
+          <span className="font-semibold text-stone-900 text-sm tracking-tight">
             Vault
           </span>
         </Link>
@@ -45,7 +47,7 @@ function LockIcon({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >

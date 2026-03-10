@@ -29,7 +29,7 @@ export function RecordingControls({
     <div className="flex flex-col gap-3">
       {status === "idle" && (
         <Button size="lg" onClick={onRequestCamera} className="w-full">
-          🎥 Enable camera
+          Enable camera
         </Button>
       )}
 
@@ -67,7 +67,7 @@ export function RecordingControls({
       {status === "stopped" && (
         <div className="flex flex-col gap-3">
           <Button size="lg" onClick={onSave} loading={saving} className="w-full">
-            Save to vault 🔐
+            Save to vault
           </Button>
           <Button
             size="md"
@@ -86,7 +86,7 @@ export function RecordingControls({
           <p className="text-red-600 text-sm">{error}</p>
           <button
             onClick={onRequestCamera}
-            className="text-orange-500 hover:text-orange-600 text-sm underline mt-1"
+            className="text-rose-600 hover:text-rose-700 text-sm underline mt-1"
           >
             Try again
           </button>

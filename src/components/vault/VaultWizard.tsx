@@ -98,9 +98,9 @@ export function VaultWizard() {
             key={n}
             className={`h-2 rounded-full transition-all duration-300 ${
               n === state.step
-                ? "w-8 bg-orange-400"
+                ? "w-8 bg-rose-500"
                 : n < state.step
-                ? "w-4 bg-orange-300"
+                ? "w-4 bg-rose-300"
                 : "w-4 bg-stone-200"
             }`}
           />
