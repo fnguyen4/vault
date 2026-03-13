@@ -113,18 +113,8 @@ export function RequestWizard() {
   const back = () =>
     setState((s) => ({ ...s, step: Math.max(0, s.step - 1) }));
 
-  const handleSend = async (subject: string, body: string): Promise<void> => {
+  const handleSend = (subject: string, body: string) => {
     if (!user || !state.purpose) return;
-
-    const res = await fetch("/api/send-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ to: state.recipientEmail, subject, body }),
-    });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error ?? "Failed to send email. Please try again.");
-    }
 
     const recipientName = formatRecipientNames(state.recipients);
     const title = (() => {
@@ -152,6 +142,10 @@ export function RequestWizard() {
     };
 
     saveRequest(request);
+    window.open(
+      `mailto:${state.recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      "_blank"
+    );
     next();
   };
 

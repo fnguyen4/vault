@@ -8,7 +8,7 @@ interface StepEmailReviewProps {
   recipientEmail: string;
   initialSubject: string;
   initialBody: string;
-  onSend: (subject: string, body: string) => Promise<void>;
+  onSend: (subject: string, body: string) => void;
   onBack: () => void;
 }
 
@@ -22,19 +22,6 @@ export function StepEmailReview({
 }: StepEmailReviewProps) {
   const [subject, setSubject] = useState(initialSubject);
   const [body, setBody] = useState(initialBody);
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSend = async () => {
-    setSending(true);
-    setError(null);
-    try {
-      await onSend(subject, body);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
-      setSending(false);
-    }
-  };
 
   return (
     <div className="animate-slide-up">
@@ -77,19 +64,12 @@ export function StepEmailReview({
         />
       </div>
 
-      {error && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 mb-4">
-          {error}
-        </p>
-      )}
-
       <Button
         size="lg"
         className="w-full"
-        disabled={sending}
-        onClick={handleSend}
+        onClick={() => onSend(subject, body)}
       >
-        {sending ? "Sending…" : `Send notification to ${recipientNames}`}
+        Send notification to {recipientNames}
       </Button>
     </div>
   );
