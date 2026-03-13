@@ -8,7 +8,6 @@ import { StepSpecificOccasion } from "./wizard/StepSpecificOccasion";
 import { StepPromptSelection } from "./wizard/StepPromptSelection";
 import { StepContactPicker } from "./wizard/StepContactPicker";
 import { StepUnlockDate } from "./wizard/StepUnlockDate";
-import { StepDescription } from "./wizard/StepDescription";
 import { StepRecipientEmail } from "./wizard/StepRecipientEmail";
 import { StepEmailReview } from "./wizard/StepEmailReview";
 import { saveRequest } from "@/lib/storage/requests";
@@ -66,7 +65,6 @@ type StepId =
   | "occasion_type"
   | "prompt_selection"
   | "unlock_date"
-  | "note"
   | "recipient_email"
   | "review_email";
 
@@ -75,7 +73,7 @@ function getStepSequence(state: RequestWizardState): StepId[] {
   if (state.purpose === "specific_occasion") {
     steps.push("occasion_type", "prompt_selection");
   }
-  steps.push("unlock_date", "note", "recipient_email", "review_email");
+  steps.push("unlock_date", "recipient_email", "review_email");
   return steps;
 }
 
@@ -222,18 +220,6 @@ export function RequestWizard() {
           hint="The vault will stay sealed until this date."
           initialValue={state.unlockDate}
           onNext={(unlockDate) => next({ unlockDate })}
-          onBack={back}
-        />
-      )}
-
-      {currentStep === "note" && (
-        <StepDescription
-          question="Add a note for them (optional)"
-          hint="Tell them what you'd love to hear. This will be included in your request."
-          placeholder="e.g. I'd love to hear your favourite memory of us together..."
-          submitLabel="Continue"
-          initialValue={state.description}
-          onNext={(description) => next({ description })}
           onBack={back}
         />
       )}
