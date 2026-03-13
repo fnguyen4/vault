@@ -7,9 +7,10 @@ import { formatUnlockDate } from "@/lib/utils/dates";
 
 interface VaultCardProps {
   vault: Vault;
+  onDelete?: (id: string) => void;
 }
 
-export function VaultCard({ vault }: VaultCardProps) {
+export function VaultCard({ vault, onDelete }: VaultCardProps) {
   const { isUnlocked, daysRemaining } = useCountdown(vault.unlockDate);
 
   const subtitle = vault.vaultFor === "for_someone_else" && vault.recipientName
@@ -19,39 +20,57 @@ export function VaultCard({ vault }: VaultCardProps) {
     : "Personal memory";
 
   return (
-    <Link
-      href={`/vault/${vault.id}`}
-      className="group block bg-white hover:bg-stone-50 border border-stone-200 rounded-2xl p-5 shadow-warm hover:shadow-warm-md transition-all duration-200"
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div className={`w-9 h-9 rounded-full flex items-center justify-center ${isUnlocked ? "bg-stone-100" : "bg-rose-50"}`}>
-          {isUnlocked
-            ? <UnlockIcon className="w-4 h-4 text-stone-400" />
-            : <LockIcon className="w-4 h-4 text-rose-500" />
-          }
+    <div className="relative group">
+      <Link
+        href={`/vault/${vault.id}`}
+        className="block bg-white hover:bg-stone-50 border border-stone-200 rounded-2xl p-5 shadow-warm hover:shadow-warm-md transition-all duration-200"
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center ${isUnlocked ? "bg-stone-100" : "bg-rose-50"}`}>
+            {isUnlocked
+              ? <UnlockIcon className="w-4 h-4 text-stone-400" />
+              : <LockIcon className="w-4 h-4 text-rose-500" />
+            }
+          </div>
+          {!vault.hasRecording && (
+            <span className="text-xs text-rose-600 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-full font-medium">
+              Add recording
+            </span>
+          )}
         </div>
-        {!vault.hasRecording && (
-          <span className="text-xs text-rose-600 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-full font-medium">
-            Add recording
-          </span>
+        <h3 className="font-semibold text-stone-900 mb-1 leading-snug pr-6">
+          {vault.title}
+        </h3>
+        <p className="text-sm text-stone-400 mb-4">{subtitle}</p>
+        {isUnlocked ? (
+          <p className="text-xs text-emerald-600 font-medium">
+            Opened · {formatUnlockDate(vault.unlockDate)}
+          </p>
+        ) : (
+          <p className="text-xs text-stone-400">
+            Opens in {daysRemaining === 0 ? "less than a day" : `${daysRemaining} day${daysRemaining !== 1 ? "s" : ""}`}
+            {" · "}
+            {formatUnlockDate(vault.unlockDate)}
+          </p>
         )}
-      </div>
-      <h3 className="font-semibold text-stone-900 mb-1 leading-snug">
-        {vault.title}
-      </h3>
-      <p className="text-sm text-stone-400 mb-4">{subtitle}</p>
-      {isUnlocked ? (
-        <p className="text-xs text-emerald-600 font-medium">
-          Opened · {formatUnlockDate(vault.unlockDate)}
-        </p>
-      ) : (
-        <p className="text-xs text-stone-400">
-          Opens in {daysRemaining === 0 ? "less than a day" : `${daysRemaining} day${daysRemaining !== 1 ? "s" : ""}`}
-          {" · "}
-          {formatUnlockDate(vault.unlockDate)}
-        </p>
+      </Link>
+
+      {onDelete && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            onDelete(vault.id);
+          }}
+          className="absolute top-4 right-4 p-1 text-stone-300 hover:text-stone-500 transition-colors opacity-0 group-hover:opacity-100"
+          aria-label="Delete vault"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
       )}
-    </Link>
+    </div>
   );
 }
 

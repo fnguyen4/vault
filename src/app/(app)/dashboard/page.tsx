@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { getVaultsByOwner } from "@/lib/storage/vaults";
+import { getVaultsByOwner, deleteVault } from "@/lib/storage/vaults";
 import { getRequestsByOwner, updateRequestStatus, deleteRequest } from "@/lib/storage/requests";
 import type { Vault, VaultRequest } from "@/types";
 import { VaultCard } from "@/components/vault/VaultCard";
@@ -21,6 +21,11 @@ export default function DashboardPage() {
       setRequests(getRequestsByOwner(user.id));
     }
   }, [user]);
+
+  const handleDeleteVault = (id: string) => {
+    deleteVault(id);
+    setVaults((prev) => prev.filter((v) => v.id !== id));
+  };
 
   const handleMarkFulfilled = (id: string) => {
     updateRequestStatus(id, "fulfilled");
@@ -88,7 +93,7 @@ export default function DashboardPage() {
                     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                 )
                 .map((vault) => (
-                  <VaultCard key={vault.id} vault={vault} />
+                  <VaultCard key={vault.id} vault={vault} onDelete={handleDeleteVault} />
                 ))}
             </div>
           )}
