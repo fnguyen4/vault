@@ -7,7 +7,6 @@ import { StepWhatFor } from "./wizard/StepWhatFor";
 import { StepSpecificOccasion } from "./wizard/StepSpecificOccasion";
 import { StepPromptSelection } from "./wizard/StepPromptSelection";
 import { StepContactPicker } from "./wizard/StepContactPicker";
-import { StepTitle } from "./wizard/StepTitle";
 import { StepUnlockDate } from "./wizard/StepUnlockDate";
 import { StepDescription } from "./wizard/StepDescription";
 import { StepRecipientEmail } from "./wizard/StepRecipientEmail";
@@ -32,7 +31,6 @@ type StepId =
   | "what_for"
   | "occasion_type"
   | "prompt_selection"
-  | "title"
   | "unlock_date"
   | "note"
   | "recipient_email";
@@ -42,7 +40,7 @@ function getStepSequence(state: RequestWizardState): StepId[] {
   if (state.purpose === "specific_occasion") {
     steps.push("occasion_type", "prompt_selection");
   }
-  steps.push("title", "unlock_date", "note", "recipient_email");
+  steps.push("unlock_date", "note", "recipient_email");
   return steps;
 }
 
@@ -84,7 +82,12 @@ export function RequestWizard() {
     if (!user || !state.purpose) return;
 
     const recipientName = formatRecipientNames(state.recipients);
-    const merged = { ...state, recipientEmail, recipientName };
+    const title = (() => {
+      if (state.occasionType === "birthday") return "A message for my birthday";
+      if (state.occasionType === "graduation") return "A message for my graduation";
+      if (state.occasionType === "wedding") return "A message for my wedding";
+      return "A message for the future";
+    })();
 
     const request: VaultRequest = {
       id: generateRequestId(),
@@ -92,11 +95,11 @@ export function RequestWizard() {
       requesterName: user.displayName,
       purpose: state.purpose,
       occasionType: state.occasionType,
-      occasionName: merged.occasionName,
+      occasionName: state.occasionName,
       selectedPrompts: state.selectedPrompts,
-      title: merged.title,
-      description: merged.description,
-      unlockDate: merged.unlockDate,
+      title,
+      description: state.description,
+      unlockDate: state.unlockDate,
       recipientName,
       recipientEmail,
       createdAt: new Date().toISOString(),
@@ -107,16 +110,6 @@ export function RequestWizard() {
     window.open(buildRequestMailto(request), "_blank");
     router.push("/dashboard");
   };
-
-  // Title suggestion
-  const suggestedTitle = (() => {
-    if (state.purpose === "specific_occasion" && state.occasionType) {
-      if (state.occasionType === "birthday") return "A message for my birthday";
-      if (state.occasionType === "graduation") return "A message for my graduation";
-      if (state.occasionType === "wedding") return "A message for my wedding";
-    }
-    return "A message for the future";
-  })();
 
   // Prompt selection heading: "Which questions would you like Emma and Sophie to answer?"
   const promptHeading = `Which questions would you like ${formatRecipientNames(state.recipients)} to answer?`;
@@ -146,6 +139,7 @@ export function RequestWizard() {
 
       {currentStep === "what_for" && (
         <StepWhatFor
+          hint={`This helps us craft the right prompts for ${formatRecipientNames(state.recipients)}'s recording.`}
           onSelect={(purpose: VaultPurpose) =>
             setState((s) => ({ ...s, purpose, step: s.step + 1 }))
           }
@@ -166,22 +160,11 @@ export function RequestWizard() {
       {currentStep === "prompt_selection" && (
         <StepPromptSelection
           occasionType={state.occasionType}
-          recipientName={formatRecipientNames(state.recipients)}
+          recipientName="me"
           initialSelected={state.selectedPrompts}
           heading={promptHeading}
           submitLabel="Continue"
           onNext={(selectedPrompts) => next({ selectedPrompts })}
-          onBack={back}
-        />
-      )}
-
-      {currentStep === "title" && (
-        <StepTitle
-          question="What would you like to call this vault?"
-          hint="Give it a name that captures what it means to you."
-          initialValue={state.title}
-          suggestedTitle={suggestedTitle}
-          onNext={(title) => next({ title })}
           onBack={back}
         />
       )}
@@ -234,18 +217,18 @@ function buildRequestMailto(req: VaultRequest): string {
       ? `It's for my ${req.occasionType} — I'd love to open it on ${unlockFormatted}.`
       : `I'd love to open it on ${unlockFormatted}.`;
 
+  const noteSection = req.description
+    ? `\n\n${req.description}`
+    : "";
+
   const promptsSection =
     req.selectedPrompts.length > 0
       ? `\n\nHere are some things I'd love for you to touch on:\n${req.selectedPrompts.map((p) => `- ${p}`).join("\n")}`
       : "";
 
-  const noteSection = req.description
-    ? `\n\nA little more context:\n${req.description}`
-    : "";
-
   const subject = encodeURIComponent("Could you record a message for me?");
   const body = encodeURIComponent(
-    `Hi ${req.recipientName},\n\nI hope this message finds you well. I have a small, heartfelt request — would you be willing to record a short video message for me? ${contextLine}${promptsSection}${noteSection}\n\nIt doesn't have to be long. Just something from you that I can hold onto.\n\nWith love,\n${req.requesterName}`
+    `Hi ${req.recipientName},\n\nI hope this message finds you well. I have a small, heartfelt request — would you be willing to record a short video message for me? ${contextLine}${noteSection}${promptsSection}\n\nIt doesn't have to be long. Just something from you that I can hold onto.\n\nWith love,\n${req.requesterName}`
   );
 
   return `mailto:${req.recipientEmail}?subject=${subject}&body=${body}`;

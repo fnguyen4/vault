@@ -3,6 +3,7 @@ import type { VaultPurpose } from "@/types";
 interface StepWhatForProps {
   onSelect: (value: VaultPurpose) => void;
   onBack: () => void;
+  hint?: string;
 }
 
 const options: { value: VaultPurpose; label: string; description: string }[] = [
@@ -18,7 +19,7 @@ const options: { value: VaultPurpose; label: string; description: string }[] = [
   },
 ];
 
-export function StepWhatFor({ onSelect, onBack }: StepWhatForProps) {
+export function StepWhatFor({ onSelect, onBack, hint }: StepWhatForProps) {
   return (
     <div className="animate-slide-up">
       <button
@@ -33,7 +34,7 @@ export function StepWhatFor({ onSelect, onBack }: StepWhatForProps) {
       <h2 className="font-heading text-2xl text-stone-900 mb-1.5">
         What is this vault for?
       </h2>
-      <p className="text-stone-500 text-sm mb-8">This helps us craft the right prompts for your recording.</p>
+      <p className="text-stone-500 text-sm mb-8">{hint ?? "This helps us craft the right prompts for your recording."}</p>
       <div className="grid gap-3">
         {options.map((opt) => (
           <button
