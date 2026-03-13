@@ -5,15 +5,23 @@ import type { OccasionType } from "@/types";
 interface StepSpecificOccasionProps {
   onSelect: (value: OccasionType) => void;
   onBack: () => void;
+  firstPerson?: boolean;
 }
 
-const OPTIONS: { value: OccasionType; label: string; description: string }[] = [
+const OPTIONS_THIRD: { value: OccasionType; label: string; description: string }[] = [
   { value: "birthday", label: "A birthday", description: "Celebrate a special year" },
   { value: "graduation", label: "A graduation", description: "Mark the start of a new chapter" },
   { value: "wedding", label: "A wedding", description: "Honour their big day" },
 ];
 
-export function StepSpecificOccasion({ onSelect, onBack }: StepSpecificOccasionProps) {
+const OPTIONS_FIRST: { value: OccasionType; label: string; description: string }[] = [
+  { value: "birthday", label: "My birthday", description: "Celebrate a special year" },
+  { value: "graduation", label: "My graduation", description: "Mark the start of a new chapter" },
+  { value: "wedding", label: "My wedding", description: "Honour the big day" },
+];
+
+export function StepSpecificOccasion({ onSelect, onBack, firstPerson = false }: StepSpecificOccasionProps) {
+  const OPTIONS = firstPerson ? OPTIONS_FIRST : OPTIONS_THIRD;
   return (
     <div className="animate-slide-up">
       <BackButton onClick={onBack} />

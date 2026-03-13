@@ -11,6 +11,7 @@ interface StepContactPickerProps {
   initialValue: Contact[];
   onNext: (contacts: Contact[]) => void;
   onBack: () => void;
+  heading?: string;
 }
 
 export function StepContactPicker({
@@ -18,6 +19,7 @@ export function StepContactPicker({
   initialValue,
   onNext,
   onBack,
+  heading,
 }: StepContactPickerProps) {
   const [contacts, setContacts] = useState<Contact[]>(() => getContacts());
   const [selected, setSelected] = useState<Contact[]>(initialValue);
@@ -91,7 +93,7 @@ export function StepContactPicker({
     <div className="animate-slide-up">
       <BackButton onClick={onBack} />
       <h2 className="font-heading text-3xl text-stone-900 mb-3">
-        Who are you recording this for?
+        {heading ?? "Who are you recording this for?"}
       </h2>
       <p className="text-stone-500 text-sm mb-10">
         {mode === "one"

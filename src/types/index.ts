@@ -74,7 +74,9 @@ export interface VaultRequest {
   requesterId: string;  // user ID of person requesting
   requesterName: string;
   purpose: VaultPurpose;
+  occasionType?: OccasionType | null;
   occasionName: string; // "" if purpose === "general_memory"
+  selectedPrompts: string[];
   title: string;
   description: string;
   unlockDate: string;   // ISO 8601 date string
@@ -86,6 +88,9 @@ export interface VaultRequest {
 
 export interface RequestWizardState {
   step: number;
+  recipients: Contact[];
+  occasionType: OccasionType | null;
+  selectedPrompts: string[];
   purpose: VaultPurpose | null;
   occasionName: string;
   title: string;

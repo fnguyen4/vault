@@ -11,6 +11,8 @@ interface StepPromptSelectionProps {
   initialSelected: string[];
   onNext: (prompts: string[]) => void;
   onBack: () => void;
+  heading?: string;
+  submitLabel?: string;
 }
 
 export function StepPromptSelection({
@@ -19,6 +21,8 @@ export function StepPromptSelection({
   initialSelected,
   onNext,
   onBack,
+  heading,
+  submitLabel,
 }: StepPromptSelectionProps) {
   const suggested = getSuggestedPrompts(occasionType, recipientName);
   const [selected, setSelected] = useState<string[]>(
@@ -58,7 +62,7 @@ export function StepPromptSelection({
     <div className="animate-slide-up">
       <BackButton onClick={onBack} />
       <h2 className="font-heading text-3xl text-stone-900 mb-3">
-        Which questions do you want to answer?
+        {heading ?? "Which questions do you want to answer?"}
       </h2>
       <p className="text-stone-500 text-sm mb-8">
         Select the prompts you'd like to respond to. You can add your own too.
@@ -156,7 +160,7 @@ export function StepPromptSelection({
         disabled={!canCreate}
         onClick={() => canCreate && onNext(allSelected)}
       >
-        Create the vault
+        {submitLabel ?? "Create the vault"}
       </Button>
     </div>
   );

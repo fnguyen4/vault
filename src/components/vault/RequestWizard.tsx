@@ -2,33 +2,47 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { RequestWizardState, VaultPurpose, VaultRequest } from "@/types";
+import type { RequestWizardState, VaultPurpose, OccasionType, Contact, VaultRequest } from "@/types";
 import { StepWhatFor } from "./wizard/StepWhatFor";
-import { StepOccasion } from "./wizard/StepOccasion";
+import { StepSpecificOccasion } from "./wizard/StepSpecificOccasion";
+import { StepPromptSelection } from "./wizard/StepPromptSelection";
+import { StepContactPicker } from "./wizard/StepContactPicker";
 import { StepTitle } from "./wizard/StepTitle";
 import { StepUnlockDate } from "./wizard/StepUnlockDate";
 import { StepDescription } from "./wizard/StepDescription";
-import { StepRecipientName } from "./wizard/StepRecipientName";
 import { StepRecipientEmail } from "./wizard/StepRecipientEmail";
 import { saveRequest } from "@/lib/storage/requests";
 import { generateRequestId } from "@/lib/utils/ids";
 import { useAuth } from "@/context/AuthContext";
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatRecipientNames(recipients: Contact[]): string {
+  if (recipients.length === 0) return "them";
+  if (recipients.length === 1) return recipients[0].firstName;
+  if (recipients.length === 2)
+    return `${recipients[0].firstName} and ${recipients[1].firstName}`;
+  return `${recipients[0].firstName} and ${recipients.length - 1} others`;
+}
+
 // ─── Step sequence ────────────────────────────────────────────────────────────
 
 type StepId =
+  | "recipient_contacts"
   | "what_for"
-  | "occasion"
+  | "occasion_type"
+  | "prompt_selection"
   | "title"
   | "unlock_date"
   | "note"
-  | "recipient_name"
   | "recipient_email";
 
 function getStepSequence(state: RequestWizardState): StepId[] {
-  const steps: StepId[] = ["what_for"];
-  if (state.purpose === "specific_occasion") steps.push("occasion");
-  steps.push("title", "unlock_date", "note", "recipient_name", "recipient_email");
+  const steps: StepId[] = ["recipient_contacts", "what_for"];
+  if (state.purpose === "specific_occasion") {
+    steps.push("occasion_type", "prompt_selection");
+  }
+  steps.push("title", "unlock_date", "note", "recipient_email");
   return steps;
 }
 
@@ -36,6 +50,9 @@ function getStepSequence(state: RequestWizardState): StepId[] {
 
 const initialState: RequestWizardState = {
   step: 0,
+  recipients: [],
+  occasionType: null,
+  selectedPrompts: [],
   purpose: null,
   occasionName: "",
   title: "",
@@ -66,19 +83,22 @@ export function RequestWizard() {
   const handleFinish = (recipientEmail: string) => {
     if (!user || !state.purpose) return;
 
-    const merged = { ...state, recipientEmail };
+    const recipientName = formatRecipientNames(state.recipients);
+    const merged = { ...state, recipientEmail, recipientName };
 
     const request: VaultRequest = {
       id: generateRequestId(),
       requesterId: user.id,
       requesterName: user.displayName,
       purpose: state.purpose,
+      occasionType: state.occasionType,
       occasionName: merged.occasionName,
+      selectedPrompts: state.selectedPrompts,
       title: merged.title,
       description: merged.description,
       unlockDate: merged.unlockDate,
-      recipientName: merged.recipientName,
-      recipientEmail: merged.recipientEmail,
+      recipientName,
+      recipientEmail,
       createdAt: new Date().toISOString(),
       status: "pending",
     };
@@ -88,12 +108,18 @@ export function RequestWizard() {
     router.push("/dashboard");
   };
 
-  // Title suggestion for request context
+  // Title suggestion
   const suggestedTitle = (() => {
-    if (state.purpose === "specific_occasion" && state.occasionName)
-      return `A message for my ${state.occasionName}`;
+    if (state.purpose === "specific_occasion" && state.occasionType) {
+      if (state.occasionType === "birthday") return "A message for my birthday";
+      if (state.occasionType === "graduation") return "A message for my graduation";
+      if (state.occasionType === "wedding") return "A message for my wedding";
+    }
     return "A message for the future";
   })();
+
+  // Prompt selection heading: "Which questions would you like Emma and Sophie to answer?"
+  const promptHeading = `Which questions would you like ${formatRecipientNames(state.recipients)} to answer?`;
 
   return (
     <div className="max-w-lg mx-auto">
@@ -108,21 +134,43 @@ export function RequestWizard() {
       </div>
 
       {/* Steps */}
+      {currentStep === "recipient_contacts" && (
+        <StepContactPicker
+          mode="multiple"
+          initialValue={state.recipients}
+          heading="Who are you requesting a vault from?"
+          onNext={(recipients: Contact[]) => next({ recipients })}
+          onBack={() => router.push("/dashboard")}
+        />
+      )}
+
       {currentStep === "what_for" && (
         <StepWhatFor
           onSelect={(purpose: VaultPurpose) =>
             setState((s) => ({ ...s, purpose, step: s.step + 1 }))
           }
-          onBack={() => router.push("/dashboard")}
+          onBack={back}
         />
       )}
 
-      {currentStep === "occasion" && (
-        <StepOccasion
-          question="What's the occasion?"
-          hint="Describe the moment you'd love to have a message for."
-          initialValue={state.occasionName}
-          onNext={(occasionName) => next({ occasionName })}
+      {currentStep === "occasion_type" && (
+        <StepSpecificOccasion
+          firstPerson
+          onSelect={(occasionType: OccasionType) =>
+            next({ occasionType, occasionName: occasionType })
+          }
+          onBack={back}
+        />
+      )}
+
+      {currentStep === "prompt_selection" && (
+        <StepPromptSelection
+          occasionType={state.occasionType}
+          recipientName={formatRecipientNames(state.recipients)}
+          initialSelected={state.selectedPrompts}
+          heading={promptHeading}
+          submitLabel="Continue"
+          onNext={(selectedPrompts) => next({ selectedPrompts })}
           onBack={back}
         />
       )}
@@ -160,22 +208,11 @@ export function RequestWizard() {
         />
       )}
 
-      {currentStep === "recipient_name" && (
-        <StepRecipientName
-          question="Who are you asking?"
-          hint="Enter the name of the person you'd like to record this for you."
-          placeholder="e.g. Mum, Dad, Sarah"
-          initialValue={state.recipientName}
-          onNext={(recipientName) => next({ recipientName })}
-          onBack={back}
-        />
-      )}
-
       {currentStep === "recipient_email" && (
         <StepRecipientEmail
           question="What's their email address?"
           hint="We'll draft a heartfelt request email you can send to them."
-          initialValue={state.recipientEmail}
+          initialValue={state.recipientEmail || state.recipients[0]?.email || ""}
           required
           onNext={handleFinish}
           onBack={back}
@@ -193,17 +230,22 @@ function buildRequestMailto(req: VaultRequest): string {
   });
 
   const contextLine =
-    req.purpose === "specific_occasion" && req.occasionName
-      ? `It's for ${req.occasionName} — I'd love to open it on ${unlockFormatted}.`
+    req.occasionType
+      ? `It's for my ${req.occasionType} — I'd love to open it on ${unlockFormatted}.`
       : `I'd love to open it on ${unlockFormatted}.`;
 
+  const promptsSection =
+    req.selectedPrompts.length > 0
+      ? `\n\nHere are some things I'd love for you to touch on:\n${req.selectedPrompts.map((p) => `- ${p}`).join("\n")}`
+      : "";
+
   const noteSection = req.description
-    ? `\n\nHere's a little more about what I'd love to hear:\n${req.description}`
+    ? `\n\nA little more context:\n${req.description}`
     : "";
 
   const subject = encodeURIComponent("Could you record a message for me?");
   const body = encodeURIComponent(
-    `Hi ${req.recipientName},\n\nI hope this message finds you well. I have a small, heartfelt request — would you be willing to record a short video message for me? ${contextLine}${noteSection}\n\nIt doesn't have to be long. Just something from you that I can hold onto.\n\nWith love,\n${req.requesterName}`
+    `Hi ${req.recipientName},\n\nI hope this message finds you well. I have a small, heartfelt request — would you be willing to record a short video message for me? ${contextLine}${promptsSection}${noteSection}\n\nIt doesn't have to be long. Just something from you that I can hold onto.\n\nWith love,\n${req.requesterName}`
   );
 
   return `mailto:${req.recipientEmail}?subject=${subject}&body=${body}`;
