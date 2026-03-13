@@ -118,7 +118,11 @@ export default function FinishVaultPage() {
       {currentStep === "description" && (
         <StepDescription
           question="Anything you'd like to add?"
-          hint="A note about why you made this — totally optional."
+          hint={
+            vault.vaultFor === "for_someone_else" && vault.recipientName
+              ? `A note to ${vault.recipientName} about why you made this — totally optional. ${vault.recipientName} will receive this note as he/she opens the vault.`
+              : "A note about why you made this — totally optional."
+          }
           submitLabel="Save vault"
           initialValue={vault.description}
           onNext={finish}
