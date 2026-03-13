@@ -17,7 +17,7 @@ export function StepPersonOrMultiple({ onSelect, onBack }: StepPersonOrMultipleP
     <div className="animate-slide-up">
       <BackButton onClick={onBack} />
       <h2 className="font-heading text-3xl text-stone-900 mb-3">
-        For one person or a group?
+        For one person or multiple people?
       </h2>
       <p className="text-stone-500 text-sm mb-10">
         Who will this message be for?
