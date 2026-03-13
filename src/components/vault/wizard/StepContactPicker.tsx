@@ -12,6 +12,7 @@ interface StepContactPickerProps {
   onNext: (contacts: Contact[]) => void;
   onBack: () => void;
   heading?: string;
+  subtitle?: string;
 }
 
 export function StepContactPicker({
@@ -20,6 +21,7 @@ export function StepContactPicker({
   onNext,
   onBack,
   heading,
+  subtitle,
 }: StepContactPickerProps) {
   const [contacts, setContacts] = useState<Contact[]>(() => getContacts());
   const [selected, setSelected] = useState<Contact[]>(initialValue);
@@ -96,9 +98,9 @@ export function StepContactPicker({
         {heading ?? "Who are you recording this for?"}
       </h2>
       <p className="text-stone-500 text-sm mb-10">
-        {mode === "one"
+        {subtitle ?? (mode === "one"
           ? "Search for a contact or add a new one."
-          : "Add everyone you're recording for."}
+          : "Add everyone you're recording for.")}
       </p>
 
       {/* Selected chips */}

@@ -4,6 +4,7 @@ interface StepWhatForProps {
   onSelect: (value: VaultPurpose) => void;
   onBack: () => void;
   hint?: string;
+  specificOccasionDescription?: string;
 }
 
 const options: { value: VaultPurpose; label: string; description: string }[] = [
@@ -19,7 +20,7 @@ const options: { value: VaultPurpose; label: string; description: string }[] = [
   },
 ];
 
-export function StepWhatFor({ onSelect, onBack, hint }: StepWhatForProps) {
+export function StepWhatFor({ onSelect, onBack, hint, specificOccasionDescription }: StepWhatForProps) {
   return (
     <div className="animate-slide-up">
       <button
@@ -36,29 +37,35 @@ export function StepWhatFor({ onSelect, onBack, hint }: StepWhatForProps) {
       </h2>
       <p className="text-stone-500 text-sm mb-8">{hint ?? "This helps us craft the right prompts for your recording."}</p>
       <div className="grid gap-3">
-        {options.map((opt) => (
-          <button
-            key={opt.value}
-            onClick={() => onSelect(opt.value)}
-            className="group flex items-center gap-5 p-5 bg-white hover:bg-stone-50 border border-stone-200 hover:border-stone-300 rounded-2xl text-left shadow-warm hover:shadow-warm-md transition-all duration-200"
-          >
-            <div>
-              <p className="text-base font-semibold text-stone-900 group-hover:text-rose-600 transition-colors">
-                {opt.label}
-              </p>
-              <p className="text-sm text-stone-400 mt-0.5">{opt.description}</p>
-            </div>
-            <svg
-              className="ml-auto w-5 h-5 text-stone-300 group-hover:text-rose-400 transition-colors flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
+        {options.map((opt) => {
+          const description =
+            opt.value === "specific_occasion" && specificOccasionDescription
+              ? specificOccasionDescription
+              : opt.description;
+          return (
+            <button
+              key={opt.value}
+              onClick={() => onSelect(opt.value)}
+              className="group flex items-center gap-5 p-5 bg-white hover:bg-stone-50 border border-stone-200 hover:border-stone-300 rounded-2xl text-left shadow-warm hover:shadow-warm-md transition-all duration-200"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        ))}
+              <div>
+                <p className="text-base font-semibold text-stone-900 group-hover:text-rose-600 transition-colors">
+                  {opt.label}
+                </p>
+                <p className="text-sm text-stone-400 mt-0.5">{description}</p>
+              </div>
+              <svg
+                className="ml-auto w-5 h-5 text-stone-300 group-hover:text-rose-400 transition-colors flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

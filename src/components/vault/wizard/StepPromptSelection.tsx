@@ -12,6 +12,7 @@ interface StepPromptSelectionProps {
   onNext: (prompts: string[]) => void;
   onBack: () => void;
   heading?: string;
+  subtitle?: string;
   submitLabel?: string;
 }
 
@@ -22,6 +23,7 @@ export function StepPromptSelection({
   onNext,
   onBack,
   heading,
+  subtitle,
   submitLabel,
 }: StepPromptSelectionProps) {
   const suggested = getSuggestedPrompts(occasionType, recipientName);
@@ -65,7 +67,7 @@ export function StepPromptSelection({
         {heading ?? "Which questions do you want to answer?"}
       </h2>
       <p className="text-stone-500 text-sm mb-8">
-        Select the prompts you'd like to respond to. You can add your own too.
+        {subtitle ?? "Select the prompts you'd like to respond to. You can add your own too."}
       </p>
 
       {/* Suggested prompts */}
