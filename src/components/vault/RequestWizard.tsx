@@ -10,6 +10,7 @@ import { StepContactPicker } from "./wizard/StepContactPicker";
 import { StepUnlockDate } from "./wizard/StepUnlockDate";
 import { StepRecipientEmail } from "./wizard/StepRecipientEmail";
 import { StepEmailReview } from "./wizard/StepEmailReview";
+import { StepRequestSent } from "./wizard/StepRequestSent";
 import { saveRequest } from "@/lib/storage/requests";
 import { generateRequestId } from "@/lib/utils/ids";
 import { useAuth } from "@/context/AuthContext";
@@ -66,14 +67,15 @@ type StepId =
   | "prompt_selection"
   | "unlock_date"
   | "recipient_email"
-  | "review_email";
+  | "review_email"
+  | "request_sent";
 
 function getStepSequence(state: RequestWizardState): StepId[] {
   const steps: StepId[] = ["recipient_contacts", "what_for"];
   if (state.purpose === "specific_occasion") {
     steps.push("occasion_type", "prompt_selection");
   }
-  steps.push("unlock_date", "recipient_email", "review_email");
+  steps.push("unlock_date", "recipient_email", "review_email", "request_sent");
   return steps;
 }
 
@@ -111,8 +113,18 @@ export function RequestWizard() {
   const back = () =>
     setState((s) => ({ ...s, step: Math.max(0, s.step - 1) }));
 
-  const handleSend = (subject: string, body: string) => {
+  const handleSend = async (subject: string, body: string): Promise<void> => {
     if (!user || !state.purpose) return;
+
+    const res = await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to: state.recipientEmail, subject, body }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error ?? "Failed to send email. Please try again.");
+    }
 
     const recipientName = formatRecipientNames(state.recipients);
     const title = (() => {
@@ -140,10 +152,7 @@ export function RequestWizard() {
     };
 
     saveRequest(request);
-
-    const mailtoUrl = `mailto:${state.recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoUrl, "_blank");
-    router.push("/dashboard");
+    next();
   };
 
   const recipientNames = formatRecipientNames(state.recipients);
@@ -159,14 +168,16 @@ export function RequestWizard() {
   return (
     <div className="max-w-lg mx-auto">
       {/* Progress bar */}
-      <div className="mb-12">
-        <div className="h-1 bg-stone-100 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-rose-400 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
+      {currentStep !== "request_sent" && (
+        <div className="mb-12">
+          <div className="h-1 bg-stone-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-rose-400 rounded-full transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Steps */}
       {currentStep === "recipient_contacts" && (
@@ -243,6 +254,13 @@ export function RequestWizard() {
           initialBody={emailDraft.body}
           onSend={handleSend}
           onBack={back}
+        />
+      )}
+
+      {currentStep === "request_sent" && (
+        <StepRequestSent
+          recipientNames={recipientNames}
+          onDone={() => router.push("/dashboard")}
         />
       )}
     </div>
