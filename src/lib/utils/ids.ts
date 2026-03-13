@@ -18,3 +18,7 @@ export function generateVaultId(): string {
 export function generateRequestId(): string {
   return randomId("req");
 }
+
+export function generateContactId(): string {
+  return randomId("cnt");
+}

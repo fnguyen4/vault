@@ -14,10 +14,21 @@ export interface Session {
   expiresAt: string; // ISO 8601, 30 days from login
 }
 
+// --- Contacts ---
+
+export interface Contact {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+}
+
 // --- Vault ---
 
 export type VaultFor = "for_me" | "for_someone_else";
 export type VaultPurpose = "specific_occasion" | "general_memory";
+export type OccasionType = "birthday" | "graduation" | "wedding";
+export type PersonOrMultiple = "one" | "multiple";
 
 export interface Vault {
   id: string;
@@ -26,12 +37,13 @@ export interface Vault {
   description: string;
   vaultFor: VaultFor;
   purpose: VaultPurpose;
+  occasionType?: OccasionType | null;
   recipientName: string; // "" if vaultFor === "for_me"
   recipientEmail: string; // "" if vaultFor === "for_me"
   occasionName: string; // "" if purpose === "general_memory"
-  unlockDate: string; // ISO 8601 date string e.g. "2027-06-15"
+  unlockDate: string; // ISO 8601 date — "" until completed in finish wizard
   createdAt: string; // ISO 8601
-  prompts: string[]; // 3-5 strings from Claude
+  prompts: string[];
   hasRecording: boolean;
 }
 
@@ -40,6 +52,12 @@ export interface Vault {
 export interface WizardState {
   step: number;
   vaultFor: VaultFor | null;
+  // "for someone else" fields
+  personOrMultiple: PersonOrMultiple | null;
+  recipients: Contact[];
+  occasionType: OccasionType | null;
+  selectedPrompts: string[];
+  // "for me" fields (and shared)
   purpose: VaultPurpose | null;
   recipientName: string;
   recipientEmail: string;

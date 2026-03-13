@@ -14,7 +14,31 @@ interface VaultLockedProps {
 export function VaultLocked({ vault: v }: VaultLockedProps) {
   const { user } = useAuth();
   const { daysRemaining, hoursRemaining, minutesRemaining, secondsRemaining } =
-    useCountdown(v.unlockDate);
+    useCountdown(v.unlockDate || "9999-12-31");
+
+  // Vault recorded but not yet fully set up (no unlock date set)
+  if (!v.unlockDate) {
+    return (
+      <div className="flex flex-col items-center text-center py-12 animate-fade-in">
+        <div className="w-20 h-20 rounded-full bg-amber-50 flex items-center justify-center mb-5">
+          <svg className="w-9 h-9 text-amber-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 6v6l4 2" />
+          </svg>
+        </div>
+        <span className="inline-flex items-center bg-amber-50 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full mb-4 border border-amber-100">
+          Almost ready
+        </span>
+        <h1 className="font-heading text-2xl text-stone-900 mb-2">{v.title}</h1>
+        <p className="text-stone-500 text-sm mb-8 max-w-xs leading-relaxed">
+          Your recording is saved. Choose an unlock date and add a few final details to seal the vault.
+        </p>
+        <Link href={`/vault/${v.id}/finish`}>
+          <Button variant="primary" size="lg">Finish setup</Button>
+        </Link>
+      </div>
+    );
+  }
 
   const units = [
     { value: daysRemaining, label: "days" },

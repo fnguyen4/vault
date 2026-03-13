@@ -67,7 +67,12 @@ export default function RecordPage() {
         sizeBytes: recorder.recordedBlob.size,
       });
       saveVault({ ...vault, hasRecording: true });
-      router.push(`/vault/${vault.id}`);
+      // "for someone else" vaults collect unlock date / email / description after recording
+      if (vault.vaultFor === "for_someone_else") {
+        router.push(`/vault/${vault.id}/finish`);
+      } else {
+        router.push(`/vault/${vault.id}`);
+      }
     } catch (e) {
       setSaveError(
         e instanceof Error ? e.message : "Failed to save. Please try again."
