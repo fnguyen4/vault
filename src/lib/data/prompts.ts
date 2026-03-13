@@ -7,42 +7,44 @@ export function getSuggestedPrompts(
 ): string[] {
   const n = recipientName || "them";
 
+  const name = recipientName || "you";
+
   switch (occasionType) {
     case "birthday":
       return [
-        `What's your favourite memory with ${n}?`,
-        `What do you love most about ${n}?`,
-        `What do you hope ${n}'s year ahead looks like?`,
-        `What's something ${n} might not know about how much they mean to you?`,
-        `Share a story that perfectly captures who ${n} is.`,
+        `Tell ${name} about your favourite memory together.`,
+        `What do you love most about ${name}, and what do you want them to know?`,
+        `What do you hope the year ahead holds for ${name}?`,
+        `What's something you've never told ${name} about how much they mean to you?`,
+        `Tell ${name} a story that captures exactly who they are to you.`,
       ];
 
     case "graduation":
       return [
-        `What are you most proud of about ${n}?`,
-        `What advice would you give ${n} as they start this new chapter?`,
-        `What do you think ${n}'s future holds?`,
-        `Share a moment that showed you how far ${n} has come.`,
-        `What's your wish for ${n} as they step into the world?`,
+        `Tell ${name} how proud you are — and why.`,
+        `What's the one piece of advice you most want ${name} to carry into this next chapter?`,
+        `What do you see when you imagine ${name}'s future?`,
+        `Share a moment that showed you just how far ${name} has come.`,
+        `What do you want ${name} to know and hold onto as they step into the world?`,
       ];
 
     case "wedding":
       return [
-        `What does ${n}'s relationship mean to you?`,
-        `When did you know ${n} had found the right person?`,
-        `What do you wish for ${n} and their partner in their life together?`,
-        `Share a memory of ${n} that you'll always treasure.`,
-        `What do you want ${n} to know on their wedding day?`,
+        `Tell ${name} what their love story means to you.`,
+        `Tell ${name} the moment you knew they had found the right person.`,
+        `What do you wish for ${name} and their partner as they begin their life together?`,
+        `Share a memory with ${name} that you'll always treasure.`,
+        `What do you most want ${name} to know and feel on their wedding day?`,
       ];
 
     default:
       // General memory
       return [
-        `What's your most treasured memory with ${n}?`,
-        `What has ${n} taught you?`,
-        `What do you admire most about ${n}?`,
-        `What do you want ${n} to always remember?`,
-        `If you could tell ${n} one thing, what would it be?`,
+        `Share a memory with ${name} that you'll always hold close.`,
+        `Tell ${name} what they've given you — what they've taught you or how they've changed you.`,
+        `Tell ${name} what you admire most about them.`,
+        `What do you most want ${name} to always remember about you, and about your relationship?`,
+        `If you could say one thing to ${name}, what would it be?`,
       ];
   }
 }
