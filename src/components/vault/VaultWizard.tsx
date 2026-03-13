@@ -7,13 +7,11 @@ import type {
   VaultFor,
   VaultPurpose,
   OccasionType,
-  PersonOrMultiple,
   Contact,
   Vault,
 } from "@/types";
 import { StepWhoFor } from "./wizard/StepWhoFor";
 import { StepWhatFor } from "./wizard/StepWhatFor";
-import { StepPersonOrMultiple } from "./wizard/StepPersonOrMultiple";
 import { StepContactPicker } from "./wizard/StepContactPicker";
 import { StepSpecificOccasion } from "./wizard/StepSpecificOccasion";
 import { StepPromptSelection } from "./wizard/StepPromptSelection";
@@ -29,7 +27,6 @@ import { useAuth } from "@/context/AuthContext";
 
 type StepId =
   | "who_for"
-  | "person_or_multiple"
   | "contacts"
   | "what_for"
   | "occasion_type"
@@ -43,7 +40,6 @@ function getStepSequence(state: WizardState): StepId[] {
   if (state.vaultFor === "for_someone_else") {
     const steps: StepId[] = [
       "who_for",
-      "person_or_multiple",
       "contacts",
       "what_for",
     ];
@@ -226,18 +222,9 @@ export function VaultWizard() {
       )}
 
       {/* ── "For someone else" steps ── */}
-      {currentStep === "person_or_multiple" && (
-        <StepPersonOrMultiple
-          onSelect={(personOrMultiple: PersonOrMultiple) =>
-            next({ personOrMultiple })
-          }
-          onBack={back}
-        />
-      )}
-
       {currentStep === "contacts" && (
         <StepContactPicker
-          mode={state.personOrMultiple ?? "one"}
+          mode="multiple"
           initialValue={state.recipients}
           onNext={(recipients: Contact[]) => next({ recipients })}
           onBack={back}
