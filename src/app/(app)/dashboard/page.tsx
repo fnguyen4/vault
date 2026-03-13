@@ -79,52 +79,99 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Vaults */}
+      {/* Main content */}
       {vaults.length === 0 && requests.length === 0 ? (
         <EmptyState />
       ) : (
         <>
-          {vaults.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-              {vaults
-                .slice()
-                .sort(
-                  (a, b) =>
-                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-                )
-                .map((vault) => (
-                  <VaultCard key={vault.id} vault={vault} onDelete={handleDeleteVault} />
-                ))}
+          {/* Two-column section boxes */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            {/* Left: Creating for others */}
+            <div className="bg-white border border-stone-200 rounded-2xl shadow-warm p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="font-heading text-lg text-stone-900">My vault — Creating for others</h2>
+                <Link href="/vault/new">
+                  <button className="text-xs font-semibold text-rose-500 hover:text-rose-600 transition-colors">
+                    + New vault
+                  </button>
+                </Link>
+              </div>
+              {vaults.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-stone-400 text-sm mb-4">No vaults yet.</p>
+                  <Link href="/vault/new">
+                    <Button variant="primary" size="sm">Create your first vault</Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {vaults
+                    .slice()
+                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                    .map((vault) => (
+                      <VaultCard key={vault.id} vault={vault} onDelete={handleDeleteVault} />
+                    ))}
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Right: Requesting from others */}
+            <div className="bg-white border border-stone-200 rounded-2xl shadow-warm p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="font-heading text-lg text-stone-900">Others' vaults — Requesting from others</h2>
+                <Link href="/vault/request">
+                  <button className="text-xs font-semibold text-rose-500 hover:text-rose-600 transition-colors">
+                    + New request
+                  </button>
+                </Link>
+              </div>
+              {fulfilledRequests.length === 0 && pendingRequests.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-stone-400 text-sm mb-4">No requests sent yet.</p>
+                  <Link href="/vault/request">
+                    <Button variant="secondary" size="sm">Request a vault</Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {/* Pending summary chips */}
+                  {pendingRequests.length > 0 && (
+                    <div className="flex items-center gap-2 px-4 py-3 bg-amber-50 rounded-xl border border-amber-100">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                      <span className="text-sm text-amber-800 font-medium">
+                        {pendingRequests.length} request{pendingRequests.length !== 1 ? "s" : ""} waiting
+                      </span>
+                      <span className="text-xs text-amber-600 ml-auto">↓ see below</span>
+                    </div>
+                  )}
+                  {/* Fulfilled / received */}
+                  {fulfilledRequests
+                    .slice()
+                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                    .map((req) => (
+                      <RequestCard
+                        key={req.id}
+                        request={req}
+                        onMarkFulfilled={handleMarkFulfilled}
+                        onDelete={handleDeleteRequest}
+                      />
+                    ))}
+                  {fulfilledRequests.length === 0 && (
+                    <p className="text-xs text-stone-400 text-center py-2">No received vaults yet.</p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Pending Requests */}
           {pendingRequests.length > 0 && (
-            <section className="mb-10">
+            <section>
               <h2 className="font-heading text-lg text-stone-900 mb-4">
                 Pending requests
               </h2>
               <div className="flex flex-col gap-3">
                 {pendingRequests.map((req) => (
-                  <RequestCard
-                    key={req.id}
-                    request={req}
-                    onMarkFulfilled={handleMarkFulfilled}
-                    onDelete={handleDeleteRequest}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Fulfilled Requests */}
-          {fulfilledRequests.length > 0 && (
-            <section>
-              <h2 className="font-heading text-lg text-stone-900 mb-4">
-                Received
-              </h2>
-              <div className="flex flex-col gap-3">
-                {fulfilledRequests.map((req) => (
                   <RequestCard
                     key={req.id}
                     request={req}
